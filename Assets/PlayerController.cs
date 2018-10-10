@@ -7,11 +7,14 @@ public class PlayerController : MonoBehaviour {
     public bool playerControlled = true;
     public float speed = 3f;
     Rigidbody2D rb;
+    Vector3 initialPos;
 
 
 	// Use this for initialization
 	void Start () {
         rb = GetComponent<Rigidbody2D>();
+        initialPos = transform.position;
+       
     }
 	
 	// Update is called once per frame
@@ -26,18 +29,12 @@ public class PlayerController : MonoBehaviour {
         rb.MovePosition(transform.position + speed * v3.normalized * speed *Time.deltaTime);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        //if (collision.gameObject.tag == "Enemy")
-            //print("I die :(");
-    }
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Enemy")
-            print("I die :(");
+            transform.position = initialPos;
         else
             if (collision.gameObject.tag == "Goal")
-                print("I win!");
+            print("I win!");
     }
 }
