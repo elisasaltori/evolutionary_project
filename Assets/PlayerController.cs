@@ -31,4 +31,13 @@ public class PlayerController : MonoBehaviour {
         //if (collision.gameObject.tag == "Enemy")
             //print("I die :(");
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Enemy")
+            print("I die :(");
+        else
+            if (collision.gameObject.tag == "Goal")
+                print("I win!");
+    }
 }

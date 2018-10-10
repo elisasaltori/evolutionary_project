@@ -24,9 +24,10 @@ public class EnemyController : MonoBehaviour {
         transform.Translate(Vector3.right * speed * Time.deltaTime);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+ 
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.tag == "Border")
+        if (collision.gameObject.tag == "Border")
             speed *= -1;
     }
 
