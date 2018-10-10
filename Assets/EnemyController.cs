@@ -7,6 +7,8 @@ public class EnemyController : MonoBehaviour {
     Vector3 initialPosition; //save position for resetting level
     public float speed = 2.5f;
 
+   
+
 	// Use this for initialization
 	void Start () {
         initialPosition = this.transform.position;
