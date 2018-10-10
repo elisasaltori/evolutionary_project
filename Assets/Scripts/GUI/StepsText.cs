@@ -18,6 +18,6 @@ public class StepsText : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        stepsText.text = "Steps: " + ec.currMaxSteps;
+        stepsText.text = "Steps: " + ec.GetCurrMaxSteps();
     }
 }

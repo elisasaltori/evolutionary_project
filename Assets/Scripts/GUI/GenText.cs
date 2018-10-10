@@ -16,6 +16,6 @@ public class GenText : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        genText.text = "Gen: " + ec.currGen;
+        genText.text = "Gen: " + ec.GetCurrGen();
 	}
 }

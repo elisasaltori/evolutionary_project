@@ -14,7 +14,6 @@ public class PlayerController : MonoBehaviour {
     Vector3 initialPos;
     int currStep;
     int maxSteps;
-    int nInitialSteps;
     EvolutionController ec;
     
     System.Random rand; // random number generator used for getting new directions
@@ -23,6 +22,8 @@ public class PlayerController : MonoBehaviour {
     float currDelay;
     bool won = false;
     bool deathByEnemy = false;
+    GoalMarker[] goalMarkers;
+    bool[] reachedMarker; //if a particular marker has been reached, true. Same order and size as goalmarkers
 
 	// Use this for initialization
 	void Start () {
@@ -34,10 +35,9 @@ public class PlayerController : MonoBehaviour {
         ec = GameObject.Find("EvolutionController").GetComponent<EvolutionController>();
 
         //initialize square with ec data
-        nInitialSteps = ec.beginSteps;
-        maxSteps = ec.currMaxSteps;
-        print("max:" + maxSteps);
-        print("intial:" + nInitialSteps);
+
+        maxSteps = ec.GetCurrMaxSteps();
+
 
         currStep = 0;
         currDelay = 0;
@@ -72,7 +72,7 @@ public class PlayerController : MonoBehaviour {
     {
         movements = new List<Vector3>();
 
-        for(int i=0; i<nInitialSteps; i++)
+        for(int i=0; i<maxSteps; i++)
         {
             movements.Add(GetRandomDirection());
         }
@@ -119,7 +119,7 @@ public class PlayerController : MonoBehaviour {
         return Vector3.zero;
     }
 
-    //Movement for 
+    //Movement for evolutionary algorithm
     void MoveVector()
     {
         if(currStep < maxSteps)
@@ -129,7 +129,6 @@ public class PlayerController : MonoBehaviour {
         }
         else
         {
-            print("deactivated");
             gameObject.SetActive(false);
         }
        
@@ -172,13 +171,16 @@ public class PlayerController : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Resets player to initial settings
+    /// Used when starting a new generation
+    /// </summary>
     public void ResetPlayer()
     {
         this.transform.position = initialPos;
 
         //initialize square with ec data
-        nInitialSteps = ec.beginSteps;
-        maxSteps = ec.currMaxSteps;
+        maxSteps = ec.GetCurrMaxSteps();
 
         currStep = 0;
         currDelay = 0;
@@ -189,4 +191,63 @@ public class PlayerController : MonoBehaviour {
         gameObject.SetActive(true);
     }
 
+    /// <summary>
+    /// Increase number of movements of square. New movements are randomized.
+    /// </summary>
+    /// <param name="numberOfMovements">number of movements to be added</param> 
+    public void IncreaseMovements(int numberOfMovements)
+    {
+        for(int i=0; i< numberOfMovements; i++)
+        {
+            movements.Add(GetRandomDirection());
+        }
+    }
+
+    /// <summary>
+    /// Used for initializing goalMarkers and reachedMarker
+    /// Called by EvolutionController
+    /// </summary>
+    /// <param name="goalMarkers"></param>
+    public void SetGoalMarkers(GoalMarker[] goalMarkers)
+    {
+        this.goalMarkers = goalMarkers;
+        reachedMarker = new bool[goalMarkers.Length];
+    }
+
+
+    public float GetFitnessScore()
+    {
+        //if square has won, score is based on the number of steps
+        //should be higher than if square hasn't reached goal
+        if (won)
+        {
+            return (1.0f / 16.0f + 10000.0f / (currStep * currStep));
+        }
+        else
+        {
+            //square still hasn't reached goal
+            float estimatedDistance = 0;
+
+            //go through markers to get last visited marker
+            for(int i = 0; i< reachedMarker.Length; i++)
+            {
+                //found first not reached marker
+                if(reachedMarker[i]== false)
+                {
+                    
+                    //distance from marker to goal
+                    estimatedDistance = goalMarkers[i].distanceToGoal;
+                    //distance from player to marker
+                    estimatedDistance += Vector3.Distance(goalMarkers[i].getPosition(), transform.position);
+                    break;
+                }
+            }
+
+            //give bonus to those who wore on their way and got killed by ball
+            if (deathByEnemy)
+                estimatedDistance *= 0.9f;
+
+            return (1.0f / (estimatedDistance * estimatedDistance));
+        }
+    }
 }
