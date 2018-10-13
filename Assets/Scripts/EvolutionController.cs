@@ -7,11 +7,11 @@ public class EvolutionController : MonoBehaviour {
     int currGen = 1; //current generation
     int currMaxSteps; //current number of steps
     int beginSteps = 10; //how many steps players begin with
-    int inscreaseStepGens = 5; //how many gens between step increases
+    int inscreaseStepGens = 10; //how many gens between step increases
     int increaseSteps = 5; //number of steps to be increased
-    float mutationRate = 0.1f;
+    float mutationRate = 0.2f;
 
-    int nSquares = 100;
+    int nSquares = 200;
     float fitnessSum; //used for selecting parents
     Vector3 spawnPos;
     List<Vector3> bestMovements;
@@ -24,9 +24,10 @@ public class EvolutionController : MonoBehaviour {
 
 
     int lastGenBest; //index of the best square of last gen
+    private float maxScore;
 
-   // Use this for initialization
-   void Start () {
+    // Use this for initialization
+    void Start () {
 
         lastGenBest = -1;
         startArea = GameObject.FindWithTag("StartArea");
@@ -104,6 +105,7 @@ public class EvolutionController : MonoBehaviour {
 
             //breed squares
             NaturalSelection();
+            //BreedWithBest();
 
             //increase generation number
             currGen++;
@@ -123,6 +125,31 @@ public class EvolutionController : MonoBehaviour {
 
         }
 
+    }
+
+    void BreedWithBest()
+    {
+        PlayerController aux, auxParent;
+
+        auxParent = squares[lastGenBest].GetComponent<PlayerController>();
+        List<Vector3> movements = auxParent.movements;
+
+        for (int i = 0; i < nSquares; i++)
+        {
+            //dont change the best of the generation
+            if (i != lastGenBest)
+            {
+                squares[i].transform.position = new Vector3(squares[i].transform.position.x, squares[i].transform.position.y, -0.1f);
+
+                aux = squares[i].GetComponent<PlayerController>();
+
+                //crossover
+                aux.CrossoverScoreBias(movements, maxScore);
+
+                //mutation
+                aux.Mutate();
+            }
+        }
     }
 
     void IncreasePlayerSteps()
@@ -236,7 +263,7 @@ public class EvolutionController : MonoBehaviour {
     void FindBestSquare()
     {
         PlayerController aux;
-        float maxScore = -1;
+        maxScore = -1;
         float score;
 
         for(int i=0; i< nSquares; i++)

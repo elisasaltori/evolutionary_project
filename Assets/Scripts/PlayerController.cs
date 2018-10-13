@@ -272,8 +272,8 @@ public class PlayerController : MonoBehaviour {
             }
 
             //give bonus to those who wore on their way and got killed by ball
-            if (deathByEnemy)
-                estimatedDistance *= 0.9f;
+            //if (deathByEnemy)
+            //  estimatedDistance *= 0.9f;
 
             float fitness = (1.0f / (estimatedDistance * estimatedDistance));
             return (fitness*fitness);
@@ -291,8 +291,9 @@ public class PlayerController : MonoBehaviour {
             float value;
 
             //greater chance to mutating closer to death
-            if (i > currStep - 10)
-                value = rand.Next(201)/1000.0f;
+
+            if (i > currStep - 0.3*currStep)
+                value = rand.Next(301)/1000.0f;
             else
                 value = rand.Next(1001) / 1000.0f;
 
@@ -319,5 +320,40 @@ public class PlayerController : MonoBehaviour {
         }
 
         return clone;
+    }
+
+
+    public void Crossover(List<Vector3> parentMovements)
+    {
+        int point = rand.Next(movements.Count);
+
+        for(int i=0; i<point; i++)
+        {
+            movements[i] = new Vector3(parentMovements[i].x, parentMovements[i].y, parentMovements[i].z);
+        }
+
+    }
+
+    public void CrossoverScoreBias(List<Vector3> parentMovements, float maxScore)
+    {
+        int point = rand.Next(movements.Count);
+
+        float localScore = GetFitnessScore();
+
+        // float rate = maxScore / localScore;
+        //point = 2 * (int)(point * rate) % movements.Count;
+
+        float rate = localScore / maxScore;
+
+        point =(int)( parentMovements.Count * rate);
+        point += rand.Next((int)(movements.Count * 0.5));
+        point %= movements.Count;
+        for (int i = 0; i < point; i++)
+        {
+            movements[i] = new Vector3(parentMovements[i].x, parentMovements[i].y, parentMovements[i].z);
+        }
+       
+        
+
     }
 }
