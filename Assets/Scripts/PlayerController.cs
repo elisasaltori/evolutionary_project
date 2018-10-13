@@ -125,7 +125,7 @@ public class PlayerController : MonoBehaviour {
     {
         if(currStep < maxSteps)
         {
-            rb.MovePosition(transform.position + 5*speed * movements[currStep].normalized * Time.deltaTime);
+            rb.MovePosition(transform.position + 3*speed * movements[currStep].normalized * Time.deltaTime);
             currStep++;
         }
         else
@@ -275,7 +275,8 @@ public class PlayerController : MonoBehaviour {
             if (deathByEnemy)
                 estimatedDistance *= 0.9f;
 
-            return (1.0f / (estimatedDistance * estimatedDistance));
+            float fitness = (1.0f / (estimatedDistance * estimatedDistance));
+            return (fitness*fitness);
         }
     }
 

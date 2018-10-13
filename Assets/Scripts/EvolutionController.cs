@@ -7,7 +7,7 @@ public class EvolutionController : MonoBehaviour {
     int currGen = 1; //current generation
     int currMaxSteps; //current number of steps
     int beginSteps = 10; //how many steps players begin with
-    int inscreaseStepGens = 10; //how many gens between step increases
+    int inscreaseStepGens = 5; //how many gens between step increases
     int increaseSteps = 5; //number of steps to be increased
     float mutationRate = 0.1f;
 
@@ -89,7 +89,7 @@ public class EvolutionController : MonoBehaviour {
 
 	
 	// Update is called once per frame
-	void FixedUpdate () {
+	void Update () {
 
         //did everybody die or win?
         if (AllPlayersDead())
