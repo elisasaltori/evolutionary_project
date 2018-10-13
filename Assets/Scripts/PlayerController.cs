@@ -249,7 +249,7 @@ public class PlayerController : MonoBehaviour {
         //should be higher than if square hasn't reached goal
         if (won)
         {
-            return (1.0f / 16.0f + 10000.0f / (currStep * currStep));
+            return (10000.0f / 16.0f + 10000.0f / (currStep * currStep));
         }
         else
         {
@@ -275,7 +275,7 @@ public class PlayerController : MonoBehaviour {
             //if (deathByEnemy)
             //  estimatedDistance *= 0.9f;
 
-            float fitness = (1.0f / (estimatedDistance * estimatedDistance));
+            float fitness = (10000.0f / (estimatedDistance * estimatedDistance));
             return (fitness*fitness);
         }
     }
@@ -292,8 +292,8 @@ public class PlayerController : MonoBehaviour {
 
             //greater chance to mutating closer to death
 
-            if (i > currStep - 0.3*currStep)
-                value = rand.Next(301)/1000.0f;
+            if (i > currStep - 15)
+                value = rand.Next(201)/1000.0f;
             else
                 value = rand.Next(1001) / 1000.0f;
 

@@ -9,7 +9,7 @@ public class EvolutionController : MonoBehaviour {
     int beginSteps = 10; //how many steps players begin with
     int inscreaseStepGens = 10; //how many gens between step increases
     int increaseSteps = 5; //number of steps to be increased
-    float mutationRate = 0.2f;
+    float mutationRate = 0.1f;
 
     int nSquares = 200;
     float fitnessSum; //used for selecting parents
@@ -105,7 +105,7 @@ public class EvolutionController : MonoBehaviour {
 
             //breed squares
             NaturalSelection();
-            //BreedWithBest();
+            BreedWithBest();
 
             //increase generation number
             currGen++;
