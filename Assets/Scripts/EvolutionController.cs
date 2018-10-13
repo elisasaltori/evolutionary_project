@@ -7,14 +7,14 @@ public class EvolutionController : MonoBehaviour {
     int currGen = 1; //current generation
     int currMaxSteps; //current number of steps
     int beginSteps = 10; //how many steps players begin with
-    int inscreaseStepGens = 5; //how many gens between step increases
+    int inscreaseStepGens = 10; //how many gens between step increases
     int increaseSteps = 5; //number of steps to be increased
     float mutationRate = 0.1f;
 
     int nSquares = 100;
     float fitnessSum; //used for selecting parents
     Vector3 spawnPos;
-
+    List<Vector3> bestMovements;
     public GameObject playerPrefab;
 
     GameObject startArea; //object representing starArea where squares will be spawned
@@ -89,17 +89,16 @@ public class EvolutionController : MonoBehaviour {
 
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 
         //did everybody die or win?
         if (AllPlayersDead())
         {
-            //reset level between gens
-            ResetEnemies();
+       
 
             //set best square of last generation back to original color
             SetSquareToNormalColor();
-
+            
             //find best square and keep it (also change its color)
             FindBestSquare();
 
@@ -118,7 +117,10 @@ public class EvolutionController : MonoBehaviour {
             //reset them to initial position, steps etc
             ResetPlayers();
 
-      
+            //reset level between gens
+            ResetEnemies();
+
+
         }
 
     }
@@ -127,6 +129,7 @@ public class EvolutionController : MonoBehaviour {
     {
         PlayerController aux;
 
+        print("Incrementing in gen " + currGen);
         currMaxSteps += increaseSteps;
 
         for(int i=0; i<nSquares; i++)
@@ -168,6 +171,7 @@ public class EvolutionController : MonoBehaviour {
             //dont change the best of the generation
             if(i != lastGenBest)
             {
+                squares[i].transform.position = new Vector3(squares[i].transform.position.x, squares[i].transform.position.y, -0.1f);
 
                 aux = squares[i].GetComponent<PlayerController>();
 
@@ -246,8 +250,11 @@ public class EvolutionController : MonoBehaviour {
                 maxScore = score;
             }
         }
-
+        print("Gen: "+currGen+" - "+  lastGenBest + ": " + maxScore);
+        bestMovements = squares[lastGenBest].GetComponent<PlayerController>().CloneMovements();
         squares[lastGenBest].GetComponent<SpriteRenderer>().color = Color.green;
+        squares[lastGenBest].transform.position = new Vector3(squares[lastGenBest].transform.position.x, squares[lastGenBest].transform.position.y, -0.2f);
+
 
     }
 

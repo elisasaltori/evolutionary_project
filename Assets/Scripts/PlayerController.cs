@@ -50,7 +50,7 @@ public class PlayerController : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
         if (playerControlled)
             MoveInput();
         else
@@ -125,7 +125,7 @@ public class PlayerController : MonoBehaviour {
     {
         if(currStep < maxSteps)
         {
-            rb.MovePosition(transform.position + 3*speed * movements[currStep].normalized * Time.deltaTime);
+            rb.MovePosition(transform.position + 5*speed * movements[currStep].normalized * Time.deltaTime);
             currStep++;
         }
         else
@@ -284,7 +284,7 @@ public class PlayerController : MonoBehaviour {
     /// </summary>
     public void Mutate()
     {
-        print("I died at " + currStep);
+        
         for(int i=0; i< movements.Count; i++)
         {
             float value;
@@ -295,7 +295,6 @@ public class PlayerController : MonoBehaviour {
             else
                 value = rand.Next(1001) / 1000.0f;
 
-            print(value + " rate (" + mutationRate + ")");
 
             if(value < mutationRate)
             {
