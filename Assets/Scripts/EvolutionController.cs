@@ -17,10 +17,16 @@ public class EvolutionController : MonoBehaviour {
     List<Vector3> bestMovements;
     public GameObject playerPrefab;
 
+    bool levelComplete = false;
+    int completedAtGen = -1;
+    int bestSteps;
+
     GameObject startArea; //object representing starArea where squares will be spawned
 
     GameObject[] squares; //the players
     GoalMarker[] goalMarkers; //goal markers: secondary and final objectives on screen (marked as a grey square)
+
+    GameObject wonPanel;
 
 
     int lastGenBest; //index of the best square of last gen
@@ -31,6 +37,10 @@ public class EvolutionController : MonoBehaviour {
 
         lastGenBest = -1;
         startArea = GameObject.FindWithTag("StartArea");
+        //panel that shows statistics about winning
+        wonPanel = GameObject.Find("WonPanel");
+        wonPanel.SetActive(false);
+
         spawnPos = startArea.transform.position;
         spawnPos.z = spawnPos.z - 0.1f; //just to put it above level so the picture shows up
         currMaxSteps = beginSteps;
@@ -111,7 +121,8 @@ public class EvolutionController : MonoBehaviour {
             currGen++;
 
             //add more moves every x gens
-            if (currGen % inscreaseStepGens == 0)
+            //dont add more moves if a square has already completed the level
+            if (currGen % inscreaseStepGens == 0 && !levelComplete)
                 IncreasePlayerSteps();
 
 
@@ -271,6 +282,35 @@ public class EvolutionController : MonoBehaviour {
             aux = squares[i].GetComponent<PlayerController>();
             score = aux.GetFitnessScore();
 
+            //player finished the level
+            if (aux.won)
+            {
+
+                if (levelComplete)
+                {
+                    if (aux.getCurrStep() < bestSteps)
+                    {
+                        bestSteps = aux.getCurrStep();
+                        currMaxSteps = bestSteps;
+                    }
+                        
+                }
+                else
+                {
+                    //first player to finish
+                    levelComplete = true;
+                    bestSteps = aux.getCurrStep();
+                    completedAtGen = currGen;
+
+                    //activate win panel
+                    wonPanel.SetActive(true);
+
+                    //set max steps to number of steps needed to complete
+                    //solutions that take more than the current minimum aren't useful
+                    currMaxSteps = bestSteps;
+                }
+            }
+
             if(score > maxScore)
             {
                 lastGenBest = i;
@@ -344,5 +384,15 @@ public class EvolutionController : MonoBehaviour {
     public float GetMutationRate()
     {
         return mutationRate;
+    }
+
+    public int GetCompletedAtGen()
+    {
+        return completedAtGen;
+    }
+
+    public int GetBestSteps()
+    {
+        return bestSteps;
     }
 }

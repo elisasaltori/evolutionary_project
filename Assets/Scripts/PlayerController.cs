@@ -249,7 +249,7 @@ public class PlayerController : MonoBehaviour {
         //should be higher than if square hasn't reached goal
         if (won)
         {
-            return (10000.0f / 16.0f + 10000.0f / (currStep * currStep));
+            return (100.0f + 1.0f / (currStep * currStep));
         }
         else
         {
@@ -275,7 +275,7 @@ public class PlayerController : MonoBehaviour {
             //if (deathByEnemy)
             //  estimatedDistance *= 0.9f;
 
-            float fitness = (10000.0f / (estimatedDistance * estimatedDistance));
+            float fitness = (1.0f / (estimatedDistance * estimatedDistance));
             return (fitness*fitness);
         }
     }
@@ -355,5 +355,11 @@ public class PlayerController : MonoBehaviour {
        
         
 
+    }
+
+
+    public int getCurrStep()
+    {
+        return currStep;
     }
 }

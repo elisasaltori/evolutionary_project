@@ -64,8 +64,10 @@
     <Compile Include="Assets\Scripts\Enemies\EnemyController.cs" />
     <Compile Include="Assets\Scripts\EvolutionController.cs" />
     <Compile Include="Assets\Scripts\GoalMarker.cs" />
+    <Compile Include="Assets\Scripts\GUI\BestStepsText.cs" />
     <Compile Include="Assets\Scripts\GUI\GenText.cs" />
     <Compile Include="Assets\Scripts\GUI\StepsText.cs" />
+    <Compile Include="Assets\Scripts\GUI\WinGenText.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/Public/Documents/Unity Projects/evolutionary_project/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
