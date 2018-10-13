@@ -572,9 +572,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70ce4c4b7f2ed71408fb23c85f2e6df8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currGen: 0
-  currMaxSteps: 10
-  beginSteps: 10
   playerPrefab: {fileID: 1052526751164316, guid: e87380a2ec040ae44b29a9f6a68cd05a,
     type: 2}
 --- !u!4 &78388436
@@ -2100,6 +2097,36 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4514784479550810, guid: ff7a2c44275d71643bf236790a6e9658,
     type: 2}
   m_PrefabInternal: {fileID: 74815419}
+--- !u!1 &1607744624 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1140446228109816, guid: 270079546e4df09419212342dc64ed99,
+    type: 2}
+  m_PrefabInternal: {fileID: 1294460370}
+--- !u!61 &1607744625
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1607744624}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
 --- !u!4 &1650026246 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4460326179445450, guid: 270079546e4df09419212342dc64ed99,

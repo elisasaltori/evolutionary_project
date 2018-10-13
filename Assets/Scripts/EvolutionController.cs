@@ -9,8 +9,10 @@ public class EvolutionController : MonoBehaviour {
     int beginSteps = 10; //how many steps players begin with
     int inscreaseStepGens = 5; //how many gens between step increases
     int increaseSteps = 5; //number of steps to be increased
+    float mutationRate = 0.1f;
 
     int nSquares = 100;
+    float fitnessSum; //used for selecting parents
     Vector3 spawnPos;
 
     public GameObject playerPrefab;
@@ -29,13 +31,15 @@ public class EvolutionController : MonoBehaviour {
         lastGenBest = -1;
         startArea = GameObject.FindWithTag("StartArea");
         spawnPos = startArea.transform.position;
-        spawnPos.z = spawnPos.z - 0.1f;
+        spawnPos.z = spawnPos.z - 0.1f; //just to put it above level so the picture shows up
         currMaxSteps = beginSteps;
         
   
         InitializeGoalMarkers();
         //spawn first squares
         SpawnFirstGeneration();
+
+
 	}
 
     /// <summary>
@@ -70,14 +74,14 @@ public class EvolutionController : MonoBehaviour {
 
     void SpawnFirstGeneration()
     {
-        GameObject obj;
+        squares = new GameObject[nSquares];
         //spawn all the squares
         for(int i=0; i<nSquares; i++)
         {
             //spawn square
-            obj = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
+            squares[i] = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
             //set goal markers
-            obj.GetComponent<PlayerController>().SetGoalMarkers(goalMarkers);
+            squares[i].GetComponent<PlayerController>().SetGoalMarkers(goalMarkers);
         }
             
     
@@ -86,15 +90,211 @@ public class EvolutionController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        //spawn players
-        //did everybody die or someone win?
+
+        //did everybody die or win?
+        if (AllPlayersDead())
+        {
             //reset level between gens
+            ResetEnemies();
+
+            //set best square of last generation back to original color
+            SetSquareToNormalColor();
+
             //find best square and keep it (also change its color)
+            FindBestSquare();
+
             //breed squares
+            NaturalSelection();
+
+            //increase generation number
+            currGen++;
+
+            //add more moves every x gens
+            if (currGen % inscreaseStepGens == 0)
+                IncreasePlayerSteps();
+
+
+            //spawn players
             //reset them to initial position, steps etc
+            ResetPlayers();
 
-        //add more moves every x gens
+      
+        }
 
+    }
+
+    void IncreasePlayerSteps()
+    {
+        PlayerController aux;
+
+        currMaxSteps += increaseSteps;
+
+        for(int i=0; i<nSquares; i++)
+        {
+            aux = squares[i].GetComponent<PlayerController>();
+            aux.IncreaseMovements(increaseSteps);
+        }
+    }
+    
+    /// <summary>
+    /// Reset all the squares:
+    ///     -sets them as active
+    ///     -bring them back to original position
+    ///     -reset number of steps
+    /// </summary>
+    void ResetPlayers()
+    {
+        PlayerController aux;
+        for(int i=0; i<nSquares; i++)
+        {
+            aux = squares[i].GetComponent<PlayerController>();
+            aux.ResetPlayer();
+        }
+    }
+
+    /// <summary>
+    /// Get the next generation of squares
+    /// </summary>
+    void NaturalSelection()
+    {
+        int parent;
+        PlayerController aux, auxParent;
+
+        //fitness sum is used for selecting parents
+        GetFitnessSum();
+
+        for(int i=0; i<nSquares; i++)
+        {
+            //dont change the best of the generation
+            if(i != lastGenBest)
+            {
+
+                aux = squares[i].GetComponent<PlayerController>();
+
+                //crossover
+                parent = SelectParent();
+                auxParent = squares[parent].GetComponent<PlayerController>();
+
+                //get movements
+                List<Vector3> movements = auxParent.CloneMovements();
+                aux.movements = movements;
+
+                //mutation
+                aux.Mutate();
+            }
+        }
+        
+        
+    }
+
+    void GetFitnessSum()
+    {
+        PlayerController aux;
+
+        fitnessSum = 0;
+
+        for (int i = 0; i < nSquares; i++)
+        {
+            aux = squares[i].GetComponent<PlayerController>();
+            fitnessSum += aux.GetFitnessScore();
+        }
+    }
+
+    /// <summary>
+    /// Get parent, giving a better chance to those with greater fitness
+    /// </summary>
+    /// <returns>Index of selected parent</returns>
+    int SelectParent()
+    {
+        float score = Random.Range(0, fitnessSum);
+        PlayerController aux;
+        float sum = 0;
+
+        for (int i = 0; i < nSquares; i++)
+        {
+            aux = squares[i].GetComponent<PlayerController>();
+            sum += aux.GetFitnessScore();
+            if (sum > score)
+                return i;
+        }
+
+        //unreachable
+        return 0;
+
+    }
+
+
+    /// <summary>
+    /// Find square with highest fitness score.
+    /// Save index to lastGenBest.
+    /// Color best square green.
+    /// </summary>
+    void FindBestSquare()
+    {
+        PlayerController aux;
+        float maxScore = -1;
+        float score;
+
+        for(int i=0; i< nSquares; i++)
+        {
+            aux = squares[i].GetComponent<PlayerController>();
+            score = aux.GetFitnessScore();
+
+            if(score > maxScore)
+            {
+                lastGenBest = i;
+                maxScore = score;
+            }
+        }
+
+        squares[lastGenBest].GetComponent<SpriteRenderer>().color = Color.green;
+
+    }
+
+    /// <summary>
+    /// Set square to normal color.
+    /// Used to make the square of last gen back into normal color
+    /// </summary>
+    void SetSquareToNormalColor()
+    {
+        if(lastGenBest>=0 && lastGenBest < nSquares)
+        {
+            SpriteRenderer aux = squares[lastGenBest].GetComponent<SpriteRenderer>();
+            aux.color = Color.white;
+        }
+    }
+
+    /// <summary>
+    /// Find all enemies in level and reset it
+    /// </summary>
+    void ResetEnemies()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        EnemyController aux;
+
+        for (int i = 0; i < enemies.Length; i++)
+        {
+            aux = enemies[i].GetComponent<EnemyController>();
+            aux.ResetEnemy();
+        }
+    }
+
+    /// <summary>
+    /// Return true if all players are dead or have completed the course
+    /// </summary>
+    /// <returns></returns>
+    bool AllPlayersDead()
+    {
+        //check if any player is active
+        //if so, return false
+        for(int i=0; i<nSquares; i++)
+        {
+            if (squares[i].activeSelf)
+                return false;
+        }
+
+        //all players inactive
+        return true;
     }
 
     public int GetCurrMaxSteps()
@@ -105,5 +305,10 @@ public class EvolutionController : MonoBehaviour {
     public int GetCurrGen()
     {
         return currGen;
+    }
+
+    public float GetMutationRate()
+    {
+        return mutationRate;
     }
 }

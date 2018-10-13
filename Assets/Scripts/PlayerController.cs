@@ -14,13 +14,14 @@ public class PlayerController : MonoBehaviour {
     Vector3 initialPos;
     int currStep;
     int maxSteps;
+    float mutationRate;
     EvolutionController ec;
     
     System.Random rand; // random number generator used for getting new directions
 
     float movementDelay = 0.06f; //delay algorithm movement, but make steps larger: less steps for algorithm to learn
     float currDelay;
-    bool won = false;
+    public bool won = false;
     bool deathByEnemy = false;
     GoalMarker[] goalMarkers;
     bool[] reachedMarker; //if a particular marker has been reached, true. Same order and size as goalmarkers
@@ -37,7 +38,7 @@ public class PlayerController : MonoBehaviour {
         //initialize square with ec data
 
         maxSteps = ec.GetCurrMaxSteps();
-
+        mutationRate = ec.GetMutationRate();
 
         currStep = 0;
         currDelay = 0;
@@ -160,15 +161,33 @@ public class PlayerController : MonoBehaviour {
         //collided with something else
         else
         {
+            if(collision.gameObject.tag == "GoalMarker")
+            {
+                SetGoalMarkerAsVisited(collision.transform.position);
+            }
+
             //is it the end of the level?
             if (collision.gameObject.tag == "Goal")
             {
                 won = true;
+                gameObject.SetActive(false);
                 print("I win!");
             }
 
         }
 
+    }
+
+    void SetGoalMarkerAsVisited(Vector3 pos)
+    {
+        for(int i=0; i<goalMarkers.Length; i++)
+        {
+            if(goalMarkers[i].transform.position == pos)
+            {
+                reachedMarker[i] = true;
+                break;
+            }
+        }
     }
 
     /// <summary>
@@ -186,9 +205,18 @@ public class PlayerController : MonoBehaviour {
         currDelay = 0;
 
         deathByEnemy = false;
+        ResetMarkers();
         
         won = false;
         gameObject.SetActive(true);
+    }
+
+    void ResetMarkers()
+    {
+        for(int i=0; i<reachedMarker.Length; i++)
+        {
+            reachedMarker[i] = false;
+        }
     }
 
     /// <summary>
@@ -249,5 +277,47 @@ public class PlayerController : MonoBehaviour {
 
             return (1.0f / (estimatedDistance * estimatedDistance));
         }
+    }
+
+    /// <summary>
+    /// Mutate movements
+    /// </summary>
+    public void Mutate()
+    {
+        print("I died at " + currStep);
+        for(int i=0; i< movements.Count; i++)
+        {
+            float value;
+
+            //greater chance to mutating closer to death
+            if (i > currStep - 10)
+                value = rand.Next(201)/1000.0f;
+            else
+                value = rand.Next(1001) / 1000.0f;
+
+            print(value + " rate (" + mutationRate + ")");
+
+            if(value < mutationRate)
+            {
+                movements[i] = GetRandomDirection();
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// Get deep copy of movements
+    /// </summary>
+    /// <returns>Copy of movements</returns>
+    public List<Vector3> CloneMovements()
+    {
+        List<Vector3> clone = new List<Vector3>();
+
+        for(int i=0; i<movements.Count; i++)
+        {
+            clone.Add(new Vector3(movements[i].x, movements[i].y, movements[i].z));
+        }
+
+        return clone;
     }
 }

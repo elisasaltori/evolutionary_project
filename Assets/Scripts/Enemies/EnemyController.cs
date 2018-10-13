@@ -5,6 +5,7 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour {
 
     Vector3 initialPosition; //save position for resetting level
+    float initialSpeed;
     public float speed = 2.5f;
 
    
@@ -12,7 +13,7 @@ public class EnemyController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         initialPosition = this.transform.position;
-
+        initialSpeed = speed;
 
 	}
 	
@@ -20,6 +21,16 @@ public class EnemyController : MonoBehaviour {
 	void Update () {
         MoveHorizontal();
 	}
+
+    /// <summary>
+    /// Resets player position and speed to initial settings
+    /// </summary>
+    public void ResetEnemy()
+    {
+        transform.position = initialPosition;
+        speed = initialSpeed;
+    }
+
 
     void MoveHorizontal()
     {
