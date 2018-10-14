@@ -21,6 +21,11 @@ public class EvolutionController : MonoBehaviour {
     int completedAtGen = -1;
     int bestSteps;
 
+    //used for saving information about the game
+    float[] lastBestFitness;
+    float[] lastAverageFitness;
+    int[] lastGens;
+
     GameObject startArea; //object representing starArea where squares will be spawned
 
     GameObject[] squares; //the players
@@ -44,8 +49,15 @@ public class EvolutionController : MonoBehaviour {
         spawnPos = startArea.transform.position;
         spawnPos.z = spawnPos.z - 0.1f; //just to put it above level so the picture shows up
         currMaxSteps = beginSteps;
-        
-  
+
+
+        //used for saving in file
+        //delete old file
+        SaveScores.deleteCSV();
+        lastBestFitness = new float[10];
+        lastAverageFitness = new float[10];
+        lastGens = new int[10];
+
         InitializeGoalMarkers();
         //spawn first squares
         SpawnFirstGeneration();
@@ -116,6 +128,14 @@ public class EvolutionController : MonoBehaviour {
             //breed squares
             NaturalSelection();
             BreedWithBest();
+
+            //save index of generation
+            lastGens[(currGen-1) % 10] = currGen;
+            //every ten generations, save information to file
+            if(currGen%10 == 0)
+            {
+                SaveScores.SaveDataToCSV(lastGens, lastBestFitness, lastAverageFitness);
+            }
 
             //increase generation number
             currGen++;
@@ -277,10 +297,14 @@ public class EvolutionController : MonoBehaviour {
         maxScore = -1;
         float score;
 
+        //save average fitness for generation
+        lastAverageFitness[(currGen-1) % 10] = 0;
+
         for(int i=0; i< nSquares; i++)
         {
             aux = squares[i].GetComponent<PlayerController>();
             score = aux.GetFitnessScore();
+            lastAverageFitness[(currGen-1) % 10] += score;
 
             //player finished the level
             if (aux.won)
@@ -317,11 +341,15 @@ public class EvolutionController : MonoBehaviour {
                 maxScore = score;
             }
         }
+
         print("Gen: "+currGen+" - "+  lastGenBest + ": " + maxScore);
         bestMovements = squares[lastGenBest].GetComponent<PlayerController>().CloneMovements();
         squares[lastGenBest].GetComponent<SpriteRenderer>().color = Color.green;
         squares[lastGenBest].transform.position = new Vector3(squares[lastGenBest].transform.position.x, squares[lastGenBest].transform.position.y, -0.2f);
 
+        //best fitness of generation and averagefitness
+        lastAverageFitness[(currGen-1) % 10] /= nSquares;
+        lastBestFitness[(currGen-1) % 10] = maxScore;
 
     }
 

@@ -69,6 +69,7 @@
     <Compile Include="Assets\Scripts\GUI\StepsText.cs" />
     <Compile Include="Assets\Scripts\GUI\WinGenText.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
+    <Compile Include="Assets\Scripts\SaveScores.cs" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/Public/Documents/Unity Projects/evolutionary_project/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>

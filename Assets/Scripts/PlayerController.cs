@@ -249,7 +249,7 @@ public class PlayerController : MonoBehaviour {
         //should be higher than if square hasn't reached goal
         if (won)
         {
-            return (100.0f + 1.0f / (currStep * currStep));
+            return (3.0f + 1.0f / (currStep * currStep));
         }
         else
         {
