@@ -293,9 +293,10 @@ public class PlayerController : MonoBehaviour {
             //greater chance to mutating closer to death
 
             if (i > currStep - 15)
-                value = rand.Next(201)/1000.0f;
+                value = (float) rand.NextDouble() * (1.5f * mutationRate);
+            //value = rand.Next(201)/1000.0f;
             else
-                value = rand.Next(1001) / 1000.0f;
+                value = (float)rand.NextDouble();
 
 
             if(value < mutationRate)
@@ -348,6 +349,7 @@ public class PlayerController : MonoBehaviour {
         point =(int)( parentMovements.Count * rate);
         point += rand.Next((int)(movements.Count * 0.5));
         point %= movements.Count;
+        //print("copying up to " + point);
         for (int i = 0; i < point; i++)
         {
             movements[i] = new Vector3(parentMovements[i].x, parentMovements[i].y, parentMovements[i].z);

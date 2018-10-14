@@ -158,7 +158,7 @@ public class EvolutionController : MonoBehaviour {
                 aux.CrossoverScoreBias(movements, maxScore);
 
                 //mutation
-                aux.Mutate();
+                //aux.Mutate();
             }
         }
     }
