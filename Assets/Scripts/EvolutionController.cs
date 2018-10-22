@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EvolutionController : MonoBehaviour {
 
@@ -19,7 +22,16 @@ public class EvolutionController : MonoBehaviour {
 
     bool levelComplete = false;
     int completedAtGen = -1;
+    int bestSquareFromGen = -1;
     int bestSteps;
+
+    //backup for when loading best square from file
+    int completedAtGenAux = -1;
+    int bestSquareFromGenAux = -1;
+    int bestStepsAux;
+
+    bool evolutionPaused = false;
+    GameObject bestSquare;
 
     //used for saving information about the game
     float[] lastBestFitness;
@@ -113,48 +125,60 @@ public class EvolutionController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
-        //did everybody die or win?
-        if (AllPlayersDead())
+        if (evolutionPaused)
         {
-       
-
-            //set best square of last generation back to original color
-            SetSquareToNormalColor();
-            
-            //find best square and keep it (also change its color)
-            FindBestSquare();
-
-            //breed squares
-            NaturalSelection();
-            BreedWithBest();
-
-            //save index of generation
-            lastGens[(currGen-1) % 10] = currGen;
-            //every ten generations, save information to file
-            if(currGen%10 == 0)
+            //best square died
+            if (!bestSquare.activeSelf)
             {
-                SaveScores.SaveDataToCSV(lastGens, lastBestFitness, lastAverageFitness);
+
             }
-
-            //increase generation number
-            currGen++;
-
-            //add more moves every x gens
-            //dont add more moves if a square has already completed the level
-            if (currGen % inscreaseStepGens == 0 && !levelComplete)
-                IncreasePlayerSteps();
-
-
-            //spawn players
-            //reset them to initial position, steps etc
-            ResetPlayers();
-
-            //reset level between gens
-            ResetEnemies();
-
-
         }
+        else
+        {
+            //did everybody die or win?
+            if (AllPlayersDead())
+            {
+
+
+                //set best square of last generation back to original color
+                SetSquareToNormalColor();
+
+                //find best square and keep it (also change its color)
+                FindBestSquare();
+
+                //breed squares
+                NaturalSelection();
+                BreedWithBest();
+
+                //save index of generation
+                lastGens[(currGen - 1) % 10] = currGen;
+                //every ten generations, save information to file
+                if (currGen % 10 == 0)
+                {
+                    SaveScores.SaveDataToCSV(lastGens, lastBestFitness, lastAverageFitness);
+                }
+
+                //increase generation number
+                currGen++;
+
+                //add more moves every x gens
+                //dont add more moves if a square has already completed the level
+                if (currGen % inscreaseStepGens == 0 && !levelComplete)
+                    IncreasePlayerSteps();
+
+
+                //spawn players
+                //reset them to initial position, steps etc
+                ResetPlayers();
+
+                //reset level between gens
+                ResetEnemies();
+
+
+            }
+        }
+           
+
 
     }
 
@@ -316,6 +340,9 @@ public class EvolutionController : MonoBehaviour {
                     {
                         bestSteps = aux.getCurrStep();
                         currMaxSteps = bestSteps;
+                        bestMovements = squares[i].GetComponent<PlayerController>().CloneMovements();
+                        SaveBestSquare();
+                        bestSquareFromGen = currGen;
                     }
                         
                 }
@@ -325,6 +352,7 @@ public class EvolutionController : MonoBehaviour {
                     levelComplete = true;
                     bestSteps = aux.getCurrStep();
                     completedAtGen = currGen;
+                    bestSquareFromGen = currGen;
 
                     //activate win panel
                     wonPanel.SetActive(true);
@@ -332,6 +360,8 @@ public class EvolutionController : MonoBehaviour {
                     //set max steps to number of steps needed to complete
                     //solutions that take more than the current minimum aren't useful
                     currMaxSteps = bestSteps;
+                    bestMovements = squares[i].GetComponent<PlayerController>().CloneMovements();
+                    SaveBestSquare();
                 }
             }
 
@@ -343,7 +373,6 @@ public class EvolutionController : MonoBehaviour {
         }
 
         print("Gen: "+currGen+" - "+  lastGenBest + ": " + maxScore);
-        bestMovements = squares[lastGenBest].GetComponent<PlayerController>().CloneMovements();
         squares[lastGenBest].GetComponent<SpriteRenderer>().color = Color.green;
         squares[lastGenBest].transform.position = new Vector3(squares[lastGenBest].transform.position.x, squares[lastGenBest].transform.position.y, -0.2f);
 
@@ -424,12 +453,18 @@ public class EvolutionController : MonoBehaviour {
         return bestSteps;
     }
 
+    public int GetBestSquareFromGen()
+    {
+        return bestSquareFromGen;
+    }
+
     /// <summary>
     /// Public function called by reset buttons to
     /// 
     /// </summary>
     public void ResetEvolution()
     {
+        evolutionPaused = false;
         //destroy squares
         DeleteSquares();
 
@@ -441,6 +476,7 @@ public class EvolutionController : MonoBehaviour {
 
         //spawn squares again
         SpawnFirstGeneration();
+        
 
     }
 
@@ -476,5 +512,142 @@ public class EvolutionController : MonoBehaviour {
         {
             GameObject.Destroy(squares[i]);
         }
+    }
+
+    /// <summary>
+    /// Save data of best square to file
+    /// </summary>
+    void SaveBestSquare()
+    {
+
+        string sceneName = SceneManager.GetActiveScene().name;
+        BinaryFormatter bf;
+        System.IO.FileStream file;
+
+        //check if file exists
+        //if so, load beast square
+        //check if current square is better
+        //if not, abort
+        if (File.Exists(Application.persistentDataPath + "/" + sceneName + ".save"))
+        {
+            bf = new BinaryFormatter();
+            file = File.Open(Application.persistentDataPath + "/" + sceneName + ".save", FileMode.Open);
+            BestSquare currentBest = (BestSquare)bf.Deserialize(file);
+            file.Close();
+
+            if (bestSteps >= currentBest.nSteps)
+                return;
+
+        }
+
+        List<SerializableVector3> serializableMovements = new List<SerializableVector3>();
+
+        for (int i = 0; i < bestMovements.Count; i++)
+            serializableMovements.Add(new SerializableVector3(bestMovements[i].x, bestMovements[i].y, bestMovements[i].z));
+
+        //save square to file
+        BestSquare square = new BestSquare
+        {
+            //movements
+            movements = serializableMovements,
+            //gen
+            gen = currGen,
+            //number of steps
+            nSteps = bestSteps
+        };
+
+
+        bf = new BinaryFormatter();
+        file = File.Create(Application.persistentDataPath + "/"+ sceneName+ ".save");
+        bf.Serialize(file, square);
+        file.Close();
+
+        
+    }
+
+    public void ResumeEvolution()
+    {
+        //delete best square
+        //unpause evolution
+        ResetPlayers();
+        ResetEnemies();
+        evolutionPaused = false;
+        if (!levelComplete)
+            wonPanel.SetActive(false);
+
+        //update panel
+        bestSteps = bestStepsAux;
+        bestSquareFromGen = bestSquareFromGenAux;
+        completedAtGen = completedAtGenAux;
+
+        GameObject.Destroy(bestSquare);
+
+
+    }
+
+    public void LoadBestSquare()
+    {
+        string sceneName = SceneManager.GetActiveScene().name;
+        BinaryFormatter bf;
+        System.IO.FileStream file;
+        BestSquare currentBest;
+
+        //load file
+
+        if (File.Exists(Application.persistentDataPath + "/" + sceneName + ".save"))
+        {
+            bf = new BinaryFormatter();
+            file = File.Open(Application.persistentDataPath + "/" + sceneName + ".save", FileMode.Open);
+            currentBest = (BestSquare)bf.Deserialize(file);
+            file.Close();
+
+
+
+        }
+        else
+        {
+            print("no square found!");
+            return;
+        }
+
+        //pause evolution
+        PauseEvolution();
+
+        //backup current stats
+        bestStepsAux = bestSteps;
+        bestSquareFromGenAux = bestSquareFromGen;
+        completedAtGenAux = completedAtGen;
+
+        //update best data
+        bestSteps = currentBest.nSteps;
+        bestSquareFromGen = currentBest.gen;
+        completedAtGen = currentBest.gen;
+
+        //update panel
+        wonPanel.SetActive(true);
+
+        //put best square on screen
+        bestSquare = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
+
+
+        List<Vector3> movs = new List<Vector3>();
+        for (int i = 0; i < currentBest.movements.Count; i++)
+            movs.Add(currentBest.movements[i]);
+
+        bestSquare.GetComponent<PlayerController>().movements = movs;
+
+        //resetEnemies
+        ResetEnemies();
+
+    }
+
+    void PauseEvolution()
+    {
+        for(int i=0; i<nSquares; i++)
+        {
+            squares[i].SetActive(false);
+        }
+        evolutionPaused = true;
+
     }
 }
