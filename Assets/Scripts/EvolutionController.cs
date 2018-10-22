@@ -424,6 +424,10 @@ public class EvolutionController : MonoBehaviour {
         return bestSteps;
     }
 
+    /// <summary>
+    /// Public function called by reset buttons to
+    /// 
+    /// </summary>
     public void ResetEvolution()
     {
         //destroy squares
@@ -440,6 +444,9 @@ public class EvolutionController : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Reset evolution parameters. Called by ResetEvolution
+    /// </summary>
     void ResetParameters()
     {
 
@@ -460,6 +467,9 @@ public class EvolutionController : MonoBehaviour {
         SpawnFirstGeneration();
     }
 
+    /// <summary>
+    /// Delete all square game objects
+    /// </summary>
     void DeleteSquares()
     {
         for(int i=0; i < squares.Length; i++)
