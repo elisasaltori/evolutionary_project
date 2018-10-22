@@ -423,4 +423,48 @@ public class EvolutionController : MonoBehaviour {
     {
         return bestSteps;
     }
+
+    public void ResetEvolution()
+    {
+        //destroy squares
+        DeleteSquares();
+
+        //reset parameters
+        ResetParameters();
+
+        //hide best gen UI
+        wonPanel.SetActive(false);
+
+        //spawn squares again
+        SpawnFirstGeneration();
+
+    }
+
+    void ResetParameters()
+    {
+
+        lastGenBest = -1;
+        levelComplete = false;
+        currMaxSteps = beginSteps;
+        currGen = 1;
+
+
+        //used for saving in file
+        //delete old file
+        SaveScores.deleteCSV();
+        lastBestFitness = new float[10];
+        lastAverageFitness = new float[10];
+        lastGens = new int[10];
+
+        //spawn first squares
+        SpawnFirstGeneration();
+    }
+
+    void DeleteSquares()
+    {
+        for(int i=0; i < squares.Length; i++)
+        {
+            GameObject.Destroy(squares[i]);
+        }
+    }
 }
