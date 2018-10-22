@@ -131,7 +131,8 @@ public class EvolutionController : MonoBehaviour {
             //best square died
             if (!bestSquare.activeSelf)
             {
-
+                bestSquare.GetComponent<PlayerController>().ResetPlayer();
+                ResetEnemies();
             }
         }
         else
@@ -567,14 +568,14 @@ public class EvolutionController : MonoBehaviour {
         
     }
 
+    /// <summary>
+    /// Resume evolution AFTER loading saved square
+    /// Use without having paused the evolution and you will be in trouble
+    /// </summary>
     public void ResumeEvolution()
     {
         //delete best square
         GameObject.Destroy(bestSquare);
-
-
-        
-
 
         //update panel
         bestSteps = bestStepsAux;
@@ -593,6 +594,9 @@ public class EvolutionController : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Load best square from file on level
+    /// </summary>
     public void LoadBestSquare()
     {
         string sceneName = SceneManager.GetActiveScene().name;
@@ -657,6 +661,9 @@ public class EvolutionController : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Pause evolution by hiding squares and setting flag
+    /// </summary>
     void PauseEvolution()
     {
         for(int i=0; i<nSquares; i++)

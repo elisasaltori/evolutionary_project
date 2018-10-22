@@ -208,7 +208,8 @@ public class PlayerController : MonoBehaviour {
         currDelay = 0;
 
         deathByEnemy = false;
-        ResetMarkers();
+        if(!loadedSquare)
+            ResetMarkers();
         
         won = false;
         gameObject.SetActive(true);
