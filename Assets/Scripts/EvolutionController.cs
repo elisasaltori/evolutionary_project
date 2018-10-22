@@ -29,6 +29,7 @@ public class EvolutionController : MonoBehaviour {
     int completedAtGenAux = -1;
     int bestSquareFromGenAux = -1;
     int bestStepsAux;
+    int currMaxStepsAux;
 
     bool evolutionPaused = false;
     GameObject bestSquare;
@@ -465,6 +466,7 @@ public class EvolutionController : MonoBehaviour {
     public void ResetEvolution()
     {
         evolutionPaused = false;
+
         //destroy squares
         DeleteSquares();
 
@@ -568,19 +570,25 @@ public class EvolutionController : MonoBehaviour {
     public void ResumeEvolution()
     {
         //delete best square
+        GameObject.Destroy(bestSquare);
+
+
+        
+
+
+        //update panel
+        bestSteps = bestStepsAux;
+        bestSquareFromGen = bestSquareFromGenAux;
+        completedAtGen = completedAtGenAux;
+        currMaxSteps = currMaxStepsAux;
+
+
         //unpause evolution
         ResetPlayers();
         ResetEnemies();
         evolutionPaused = false;
         if (!levelComplete)
             wonPanel.SetActive(false);
-
-        //update panel
-        bestSteps = bestStepsAux;
-        bestSquareFromGen = bestSquareFromGenAux;
-        completedAtGen = completedAtGenAux;
-
-        GameObject.Destroy(bestSquare);
 
 
     }
@@ -617,22 +625,30 @@ public class EvolutionController : MonoBehaviour {
         bestStepsAux = bestSteps;
         bestSquareFromGenAux = bestSquareFromGen;
         completedAtGenAux = completedAtGen;
+        currMaxStepsAux = currMaxSteps;
 
         //update best data
         bestSteps = currentBest.nSteps;
         bestSquareFromGen = currentBest.gen;
         completedAtGen = currentBest.gen;
+        currMaxSteps = currentBest.nSteps;
+ 
 
         //update panel
         wonPanel.SetActive(true);
 
         //put best square on screen
         bestSquare = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
+        bestSquare.GetComponent<PlayerController>().loadedSquare = true;
 
 
         List<Vector3> movs = new List<Vector3>();
         for (int i = 0; i < currentBest.movements.Count; i++)
+        {
             movs.Add(currentBest.movements[i]);
+            print("mov " + i + ": " + currentBest.movements[i].x + "," + currentBest.movements[i].y);
+        }
+            
 
         bestSquare.GetComponent<PlayerController>().movements = movs;
 

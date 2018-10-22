@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour {
     float movementDelay = 0.06f; //delay algorithm movement, but make steps larger: less steps for algorithm to learn
     float currDelay;
     public bool won = false;
+    public bool loadedSquare = false;
     bool deathByEnemy = false;
     GoalMarker[] goalMarkers;
     bool[] reachedMarker; //if a particular marker has been reached, true. Same order and size as goalmarkers
@@ -44,7 +45,9 @@ public class PlayerController : MonoBehaviour {
         currDelay = 0;
 
         //get initial list of movements
-        InitializeMovements();
+        //if not a square loaded from disk
+        if (!loadedSquare)
+            InitializeMovements();
         
 
     }
