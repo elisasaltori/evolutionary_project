@@ -19,9 +19,11 @@ public class BestSquareButton : MonoBehaviour {
     {
         if (loadText)
         {
-            text.text = "Resume";
-            ec.LoadBestSquare();
-            loadText = false;
+            //load square and check if it worked
+            if (ec.LoadBestSquare()) { 
+                text.text = "Resume";
+                loadText = false;
+            }
         }
         else
         {

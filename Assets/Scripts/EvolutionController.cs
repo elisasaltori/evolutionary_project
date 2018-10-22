@@ -597,7 +597,7 @@ public class EvolutionController : MonoBehaviour {
     /// <summary>
     /// Load best square from file on level
     /// </summary>
-    public void LoadBestSquare()
+    public bool LoadBestSquare()
     {
         string sceneName = SceneManager.GetActiveScene().name;
         BinaryFormatter bf;
@@ -619,7 +619,7 @@ public class EvolutionController : MonoBehaviour {
         else
         {
             print("no square found!");
-            return;
+            return false;
         }
 
         //pause evolution
@@ -658,6 +658,7 @@ public class EvolutionController : MonoBehaviour {
 
         //resetEnemies
         ResetEnemies();
+        return true;
 
     }
 
