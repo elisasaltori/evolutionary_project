@@ -9,12 +9,14 @@ public class EvolutionController : MonoBehaviour {
 
     int currGen = 1; //current generation
     int currMaxSteps; //current number of steps
-    int beginSteps = 10; //how many steps players begin with
-    int inscreaseStepGens = 10; //how many gens between step increases
-    int increaseSteps = 5; //number of steps to be increased
-    float mutationRate = 0.1f;
+    int beginSteps; //how many steps players begin with
+    int inscreaseStepGens; //how many gens between step increases
+    int increaseSteps; //number of steps to be increased
+    float mutationRate;
+    bool breedWithBestOn;
+    bool naturalSelectionOn;
 
-    int nSquares = 200;
+    int nSquares;
     float fitnessSum; //used for selecting parents
     Vector3 spawnPos;
     List<Vector3> bestMovements;
@@ -53,6 +55,9 @@ public class EvolutionController : MonoBehaviour {
     // Use this for initialization
     void Start () {
 
+
+        GetSettings();
+
         lastGenBest = -1;
         startArea = GameObject.FindWithTag("StartArea");
         //panel that shows statistics about winning
@@ -77,6 +82,21 @@ public class EvolutionController : MonoBehaviour {
 
 
 	}
+
+    /// <summary>
+    /// Get evolution settings set at menu
+    /// </summary>
+    void GetSettings()
+    {
+        beginSteps = EvolutionOptions.beginSteps;
+        inscreaseStepGens = EvolutionOptions.increaseStepsGens; //how many gens between step increases
+        increaseSteps = EvolutionOptions.increaseSteps; //number of steps to be increased
+        mutationRate = EvolutionOptions.mutationRate;
+        nSquares = EvolutionOptions.nSquares;
+        naturalSelectionOn = EvolutionOptions.naturalSelection;
+        breedWithBestOn = EvolutionOptions.breedWithBest;
+
+    }
 
     /// <summary>
     /// Get goal markers to calculate distance to the finish goal, which is used for fitness function
@@ -149,8 +169,10 @@ public class EvolutionController : MonoBehaviour {
                 FindBestSquare();
 
                 //breed squares
-                NaturalSelection();
-                BreedWithBest();
+                if(naturalSelectionOn)
+                    NaturalSelection();
+                if(breedWithBestOn)
+                    BreedWithBest();
 
                 //save index of generation
                 lastGens[(currGen - 1) % 10] = currGen;
