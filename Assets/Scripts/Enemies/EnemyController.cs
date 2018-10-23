@@ -34,7 +34,7 @@ public class EnemyController : MonoBehaviour {
 
     void MoveHorizontal()
     {
-        transform.Translate(Vector3.right * speed * Time.deltaTime);
+        transform.Translate(Vector3.right * speed * Time.fixedDeltaTime);
     }
 
  

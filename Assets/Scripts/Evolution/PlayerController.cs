@@ -58,7 +58,7 @@ public class PlayerController : MonoBehaviour {
             MoveInput();
         else
         {
-            currDelay += Time.deltaTime;
+            currDelay += Time.fixedDeltaTime;
             if(currDelay> movementDelay)
             {
                 currDelay = 0;
@@ -128,7 +128,7 @@ public class PlayerController : MonoBehaviour {
     {
         if(currStep < maxSteps)
         {
-            rb.MovePosition(transform.position + 3*speed * movements[currStep].normalized * Time.deltaTime);
+            rb.MovePosition(transform.position + 3*speed * movements[currStep].normalized * Time.fixedDeltaTime);
             currStep++;
         }
         else
@@ -142,7 +142,7 @@ public class PlayerController : MonoBehaviour {
     void MoveInput()
     {
         var v3 = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 0.0f);
-        rb.MovePosition(transform.position + speed * v3.normalized * Time.deltaTime);
+        rb.MovePosition(transform.position + speed * v3.normalized * Time.fixedDeltaTime);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -164,7 +164,7 @@ public class PlayerController : MonoBehaviour {
         //collided with something else
         else
         {
-            if(collision.gameObject.tag == "GoalMarker")
+            if(collision.gameObject.tag == "GoalMarker" && !loadedSquare)
             {
                 SetGoalMarkerAsVisited(collision.transform.position);
             }

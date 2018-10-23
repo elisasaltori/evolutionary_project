@@ -145,7 +145,7 @@ public class EvolutionController : MonoBehaviour {
 
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
         if (evolutionPaused)
         {
             //best square died
