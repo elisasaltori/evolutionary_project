@@ -35,5 +35,10 @@ public class MenuManager : MonoBehaviour
         Application.Quit();
     }
 
+    public void LoadLevelMenu()
+    {
+        SceneManager.LoadScene("LevelMenu");
+    }
+
 
 }
