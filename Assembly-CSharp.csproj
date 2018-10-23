@@ -63,17 +63,21 @@
   <ItemGroup>
     <Compile Include="Assets\BestSquareButton.cs" />
     <Compile Include="Assets\BestSquareText.cs" />
-    <Compile Include="Assets\Scripts\BestSquare.cs" />
     <Compile Include="Assets\Scripts\Enemies\EnemyController.cs" />
-    <Compile Include="Assets\Scripts\EvolutionController.cs" />
-    <Compile Include="Assets\Scripts\GoalMarker.cs" />
+    <Compile Include="Assets\Scripts\Evolution\EvolutionController.cs" />
+    <Compile Include="Assets\Scripts\Evolution\GoalMarker.cs" />
+    <Compile Include="Assets\Scripts\Evolution\PlayerController.cs" />
+    <Compile Include="Assets\Scripts\EvolutionOptions.cs" />
     <Compile Include="Assets\Scripts\GUI\BestStepsText.cs" />
     <Compile Include="Assets\Scripts\GUI\GenText.cs" />
+    <Compile Include="Assets\Scripts\GUI\MenuManager.cs" />
+    <Compile Include="Assets\Scripts\GUI\MenuSettings.cs" />
+    <Compile Include="Assets\Scripts\GUI\SliderText.cs" />
     <Compile Include="Assets\Scripts\GUI\StepsText.cs" />
     <Compile Include="Assets\Scripts\GUI\WinGenText.cs" />
-    <Compile Include="Assets\Scripts\PlayerController.cs" />
-    <Compile Include="Assets\Scripts\SaveScores.cs" />
-    <Compile Include="Assets\Scripts\SerializableVector3.cs" />
+    <Compile Include="Assets\Scripts\Saves\BestSquare.cs" />
+    <Compile Include="Assets\Scripts\Saves\SaveScores.cs" />
+    <Compile Include="Assets\Scripts\Saves\SerializableVector3.cs" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/Public/Documents/Unity Projects/evolutionary_project/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
