@@ -167,6 +167,7 @@ public class PlayerController : MonoBehaviour {
             if(collision.gameObject.tag == "GoalMarker" && !loadedSquare)
             {
                 SetGoalMarkerAsVisited(collision.transform.position);
+
             }
 
             //is it the end of the level?
