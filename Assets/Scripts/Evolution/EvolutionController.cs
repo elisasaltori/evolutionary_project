@@ -194,6 +194,10 @@ public class EvolutionController : MonoBehaviour {
                 //spawn players
                 //reset them to initial position, steps etc
                 ResetPlayers();
+                
+                //put best square in front
+                squares[lastGenBest].transform.position = new Vector3(squares[lastGenBest].transform.position.x, squares[lastGenBest].transform.position.y, -0.2f);
+
 
                 //reset level between gens
                 ResetEnemies();
@@ -398,8 +402,7 @@ public class EvolutionController : MonoBehaviour {
 
         print("Gen: "+currGen+" - "+  lastGenBest + ": " + maxScore);
         squares[lastGenBest].GetComponent<SpriteRenderer>().color = Color.green;
-        squares[lastGenBest].transform.position = new Vector3(squares[lastGenBest].transform.position.x, squares[lastGenBest].transform.position.y, -0.2f);
-
+        
         //best fitness of generation and averagefitness
         lastAverageFitness[(currGen-1) % 10] /= nSquares;
         lastBestFitness[(currGen-1) % 10] = maxScore;
